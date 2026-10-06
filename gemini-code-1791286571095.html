@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorium Gerak Lurus - Virtual Experiment & Online LKPD IPA Kelas 8</title>
+    <style>
+        /* ==========================================================================
+           1. CORE STYLES & VARIABLE DEFINITIONS (LAB THEME)
+           ========================================================================== */
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.35);
+            --secondary: #818cf8;
+            --accent: #06b6d4;
+            --accent-green: #10b981;
+            --accent-red: #f43f5e;
+            --accent-yellow: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --sidebar-width: 280px;
+            --font-main: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-main);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ==========================================================================
+           2. NAVIGATION & LAYOUT
+           ========================================================================== */
+        #sidebar {
+            width: var(--sidebar-width);
+            background: #0b1120;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .brand {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+        }
+
+        .brand h2 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .nav-links {
+            list-style: none;
+            overflow-y: auto;
+            flex: 1;
+            padding: 10px 0;
+        }
+
+        .nav-links li a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-links li a:hover, .nav-links li a.active {
+            background: var(--bg-card);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        .sound-toggle-container {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            background: #0b1120;
+        }
+
+        #main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 30px;
+            max-width: 1400px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .progress-container {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 6px 16px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.85rem;
+        }
+
+        .progress-bar-bg {
+            width: 120px;
+            height: 8px;
+            background: #334155;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--primary));
+            transition: width 0.3s ease;
+        }
+
+        /* ==========================================================================
+           3. UI COMPONENTS & SECTIONS
+           ========================================================================== */
+        .section-page {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+
+        .section-page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #0f172a;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .btn-secondary {
+            background: #334155;
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+            box-shadow: none;
+        }
+
+        .btn-danger {
+            background: var(--accent-red);
+            color: #fff;
+        }
+
+        .btn-success {
+            background: var(--accent-green);
+            color: #fff;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        /* Variables Bar (Inquiry) */
+        .inquiry-variables-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            background: #0f172a;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            font-size: 0.8rem;
+        }
+
+        .inquiry-box strong {
+            display: block;
+            color: var(--primary);
+            margin-bottom: 2px;
+        }
+
+        /* Canvas Simulation Display */
+        .canvas-container {
+            position: relative;
+            background: #090d16;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 220px;
+        }
+
+        .dashboard-realtime {
+            display: flex;
+            justify-content: space-around;
+            background: #0f172a;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .dash-item {
+            text-align: center;
+        }
+
+        .dash-item .val {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent);
+            font-family: monospace;
+        }
+
+        .dash-item .lbl {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Data Tables */
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+        }
+
+        th {
+            background: #0f172a;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(255,255,255,0.02);
+        }
+
+        /* Callout Box */
+        .callout {
+            padding: 14px 18px;
+            border-left: 4px solid var(--primary);
+            background: rgba(56, 189, 248, 0.08);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .callout-warning {
+            border-left-color: var(--accent-yellow);
+            background: rgba(245, 158, 11, 0.08);
+        }
+
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #334155; transition: .3s; border-radius: 22px;
+        }
+
+        .slider:before {
+            position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px;
+            background-color: white; transition: .3s; border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        /* Print Styling */
+        @media print {
+            #sidebar, .header-bar, .no-print, .btn, .switch { display: none !important; }
+            #main-content { margin-left: 0 !important; padding: 0 !important; }
+            body { background: white !important; color: black !important; }
+            .card { border: 1px solid #ccc !important; box-shadow: none !important; background: white !important; color: black !important; page-break-inside: avoid; }
+            .form-control { border: none !important; border-bottom: 1px solid #000 !important; background: transparent !important; color: black !important; }
+            th { background: #eee !important; color: black !important; }
+            td { border: 1px solid #ccc !important; color: black !important; }
+            .canvas-container { border: 1px solid #000 !important; }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            #sidebar { width: 220px; }
+            #main-content { margin-left: 220px; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            #sidebar { transform: translateX(-100%); }
+            #main-content { margin-left: 0; padding: 15px; }
+            .mobile-nav-toggle { display: block !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <nav id="sidebar">
+        <div class="brand">
+            <h2>🔬 LAB GERAK LURUS</h2>
+            <p>Virtual Lab & LKPD - IPA Kelas 8</p>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#beranda" class="active" onclick="navigateTo('beranda')"><span>🏠</span> Beranda</a></li>
+            <li><a href="#tujuan" onclick="navigateTo('tujuan')"><span>🎯</span> Tujuan & Alur Inquiry</a></li>
+            <li><a href="#pretest" onclick="navigateTo('pretest')"><span>📝</span> Diagnostic Pre-Test</a></li>
+            <li><a href="#materi" onclick="navigateTo('materi')"><span>📚</span> Bantuan Konsep & Rumus</a></li>
+            <li><a href="#exp-glb" onclick="navigateTo('exp-glb')"><span>🧪</span> Eksperimen 1: GLB</a></li>
+            <li><a href="#exp-glbb" onclick="navigateTo('exp-glbb')"><span>⚡</span> Eksperimen 2: GLBB</a></li>
+            <li><a href="#exp-duabenda" onclick="navigateTo('exp-duabenda')"><span>🏁</span> Simulasi 2 Benda</a></li>
+            <li><a href="#grafik" onclick="navigateTo('grafik')"><span>📊</span> Visualisasi Grafik</a></li>
+            <li><a href="#tantangan" onclick="navigateTo('tantangan')"><span>🎯</span> Tantangan Investigasi</a></li>
+            <li><a href="#lkpd" onclick="navigateTo('lkpd')"><span>📄</span> LKPD Online Integritas</a></li>
+            <li><a href="#kuis" onclick="navigateTo('kuis')"><span>✍️</span> Kuis Evaluasi (C2-C4)</a></li>
+            <li><a href="#refleksi" onclick="navigateTo('refleksi')"><span>💭</span> Refleksi Siswa</a></li>
+            <li><a href="#hasil" onclick="navigateTo('hasil')"><span>🏆</span> Rekap Hasil & Nilai</a></li>
+            <li><a href="#guru" onclick="navigateTo('guru')"><span>👨‍‍🏫</span> Mode Guru & Data</a></li>
+        </ul>
+        <div class="sound-toggle-container">
+            <span>🔊 Efek Suara</span>
+            <label class="switch">
+                <input type="checkbox" id="soundToggle" onchange="toggleSound(this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main id="main-content">
+        <!-- HEADER BAR -->
+        <header class="header-bar">
+            <div>
+                <h1 id="page-title" style="font-size: 1.4rem; color: var(--primary);">BERANDA</h1>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Laboratorium IPA Kurikulum Merdeka - SMPIT LHI</p>
+            </div>
+            <div class="progress-container">
+                <span id="step-indicator">Langkah 1 dari 8</span>
+                <div class="progress-bar-bg">
+                    <div id="progress-bar-fill" class="progress-bar-fill"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 1. BERANDA -->
+        <section id="sec-beranda" class="section-page active">
+            <div class="card" style="text-align: center; padding: 40px 20px;">
+                <span style="font-size: 3.5rem;">🚀</span>
+                <h2 style="font-size: 2rem; color: var(--primary); margin-top: 10px;">LABORATORIUM GERAK LURUS</h2>
+                <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 20px;">Virtual Experiment & Online LKPD Interaktif IPA Kelas 8</p>
+                <div class="callout" style="max-width: 700px; margin: 0 auto 25px auto; text-align: left;">
+                    <p> Selamat datang para Detektif Fisika! Pada laboratorium virtual ini, kamu akan melakukan investigasi ilmiah untuk membongkar rahasia <strong>Gerak Lurus Beraturan (GLB)</strong> dan <strong>Gerak Lurus Berubah Beraturan (GLBB)</strong> melalui eksperimen langsung, pengumpulan data real-time, dan pembuatan grafik otomatis.</p>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                    <button class="btn" onclick="navigateTo('pretest')">🚀 Mulai Eksperimen (Pre-Test)</button>
+                    <button class="btn btn-secondary" onclick="navigateTo('materi')">📚 Pelajari Konsep & Rumus</button>
+                    <button class="btn btn-secondary" onclick="navigateTo('tujuan')">🎯 Petunjuk & Tujuan</button>
+                </div>
+            </div>
+
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-header">⏱️ GLB</div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Amati objek yang bergerak dengan kecepatan konstan tanpa percepatan ($a = 0 \text{ m/s}^2$).</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">⚡ GLBB</div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Investigasi perubahan kecepatan secara teratur akibat adanya percepatan positif/negatif.</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">📄 LKPD Integritas</div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Isi lembar kerja secara langsung, cetak sebagai PDF, dan simpan progress-mu otomatis.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. TUJUAN PEMBELAJARAN & ALUR INQUIRY -->
+        <section id="sec-tujuan" class="section-page">
+            <div class="card">
+                <div class="card-header">🎯 Tujuan Pembelajaran</div>
+                <ul style="margin-left: 20px; font-size: 0.9rem; color: var(--text-muted);">
+                    <li>Menjelaskan konsep dasar gerak lurus, membedakan jarak vs perpindahan, serta kelajuan vs kecepatan.</li>
+                    <li>Menganalisis karakteristik GLB ($v$ konstan, $a=0$) dan GLBB ($a$ konstan, $v$ berubah).</li>
+                    <li>Menggunakan rumus fisika $s = v \times t$ dan $v_t = v_0 + a \cdot t$ secara ilmiah.</li>
+                    <li>Membaca, memplot, dan menganalisis Grafik Posisi-Waktu ($s-t$) dan Kecepatan-Waktu ($v-t$).</li>
+                    <li>Menarik kesimpulan berbasis data empiris eksperimen virtual.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-header">🔄 Alur Investigasi Ilmiah (Inquiry-Based Learning)</div>
+                <div class="grid-3" style="text-align: center; font-size: 0.85rem;">
+                    <div style="background: #0f172a; padding: 12px; border-radius: 8px;">1. Orientasi Fenomena & Prediksi</div>
+                    <div style="background: #0f172a; padding: 12px; border-radius: 8px;">2. Eksperimen & Kontrol Variabel</div>
+                    <div style="background: #0f172a; padding: 12px; border-radius: 8px;">3. Pengambilan Data & Plot Grafik</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. PRE-TEST DIAGNOSTIK -->
+        <section id="sec-pretest" class="section-page">
+            <div class="card">
+                <div class="card-header">📝 Diagnostic Pre-Test (5 Soal)</div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Uji pemahaman awalmu sebelum melakukan eksperimen. Kuis ini tidak membatasi akses eksperimen.</p>
+                <div id="pretest-questions-container"></div>
+                <button class="btn" style="margin-top: 15px;" onclick="submitPreTest()">Kirim Jawaban Pre-Test</button>
+                <div id="pretest-result" class="callout" style="display: none; margin-top: 15px;"></div>
+            </div>
+        </section>
+
+        <!-- 4. BANTUAN KONSEP & RUMUS -->
+        <section id="sec-materi" class="section-page">
+            <div class="card">
+                <div class="card-header">📚 Ringkasan Konsep & Miskonsepsi Umum</div>
+                <div class="grid-2">
+                    <div>
+                        <h4 style="color: var(--primary);">1. Gerak Lurus Beraturan (GLB)</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Gerak benda pada lintasan lurus dengan **kecepatan tetap ($v$)**. Percepatan benda nol ($a = 0 \text{ m/s}^2$).</p>
+                        <div class="callout" style="font-family: monospace; font-size: 0.9rem;">
+                            s = v × t &nbsp;&nbsp;|&nbsp;&nbsp; v = s / t &nbsp;&nbsp;|&nbsp;&nbsp; t = s / v
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--secondary);">2. Gerak Lurus Berubah Beraturan (GLBB)</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Gerak benda pada lintasan lurus dengan **percepatan tetap ($a$)**. Kecepatan berubah secara teratur.</p>
+                        <div class="callout" style="font-family: monospace; font-size: 0.85rem;">
+                            vₜ = v₀ + a·t <br>
+                            s = v₀·t + ½·a·t² <br>
+                            vₜ² = v₀² + 2·a·s
+                        </div>
+                    </div>
+                </div>
+                <div class="callout callout-warning" style="margin-top: 15px;">
+                    <strong>⚠️ Pelurus Miskonsepsi:</strong>
+                    <ul style="margin-left: 20px; font-size: 0.85rem;">
+                        <li><strong>Jarak vs Perpindahan:</strong> Jarak adalah total panjang lintasan yang ditempuh (skalar), sedangkan Perpindahan adalah perubahan posisi awal ke posisi akhir (vektor).</li>
+                        <li><strong>GLBB Tidak Selalu Makin Cepat:</strong> Jika percepatan bernilai negatif ($a < 0$), benda mengalami **perlambatan** (kecepatan berkurang).</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. EKSPERIMEN 1: GLB -->
+        <section id="sec-exp-glb" class="section-page">
+            <div class="card">
+                <div class="card-header">🧪 Eksperimen Virtual 1: Gerak Lurus Beraturan (GLB)</div>
+                
+                <div class="inquiry-variables-bar">
+                    <div class="inquiry-box"><strong>Variabel Bebas:</strong> Kecepatan ($v$), Waktu ($t$)</div>
+                    <div class="inquiry-box"><strong>Variabel Terikat:</strong> Posisi/Jarak ($s$)</div>
+                    <div class="inquiry-box"><strong>Variabel Kontrol:</strong> Percepatan ($a = 0 \text{ m/s}^2$)</div>
+                    <div class="inquiry-box"><strong>Karakteristik:</strong> Kecepatan Konstan</div>
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="canvasGLB"></canvas>
+                </div>
+
+                <div class="dashboard-realtime">
+                    <div class="dash-item"><div class="val" id="glb-dash-t">0.0 s</div><div class="lbl">Waktu (t)</div></div>
+                    <div class="dash-item"><div class="val" id="glb-dash-s">0.0 m</div><div class="lbl">Posisi (s)</div></div>
+                    <div class="dash-item"><div class="val" id="glb-dash-v">5.0 m/s</div><div class="lbl">Kecepatan (v)</div></div>
+                    <div class="dash-item"><div class="val" id="glb-dash-a">0.0 m/s²</div><div class="lbl">Percepatan (a)</div></div>
+                </div>
+
+                <div class="grid-2">
+                    <div>
+                        <div class="form-group">
+                            <label>Kecepatan awal ($v$): <span id="glb-v-val">5</span> m/s</label>
+                            <input type="range" class="form-control" id="glb-v-input" min="1" max="20" value="5" oninput="updateGLBParams()">
+                        </div>
+                        <div class="form-group">
+                            <label>Posisi Awal ($s_0$): <span id="glb-s0-val">0</span> m</label>
+                            <input type="range" class="form-control" id="glb-s0-input" min="0" max="50" value="0" oninput="updateGLBParams()">
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; justify-content: center; gap: 10px;">
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn" onclick="startSim('GLB')">▶️ MULAI</button>
+                            <button class="btn btn-secondary" onclick="pauseSim('GLB')">⏸️ PAUSE</button>
+                            <button class="btn btn-secondary" onclick="resetSim('GLB')">⏪ RESET</button>
+                            <button class="btn btn-success" onclick="recordData('GLB')">📌 CATAT DATA</button>
+                        </div>
+                        <button class="btn btn-secondary" style="margin-top: 5px;" onclick="generateRandomExp('GLB')">🎲 GENERATE EXPERIMENT</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABEL DATA GLB -->
+            <div class="card">
+                <div class="card-header">📋 Tabel Data Pengamatan GLB (Minimal 3 Data)</div>
+                <div class="table-responsive">
+                    <table id="table-glb">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Kecepatan v (m/s)</th>
+                                <th>Waktu t (s)</th>
+                                <th>Posisi s (m)</th>
+                                <th>Percepatan a (m/s²)</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody><!-- JS Render --></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. EKSPERIMEN 2: GLBB -->
+        <section id="sec-exp-glbb" class="section-page">
+            <div class="card">
+                <div class="card-header">⚡ Eksperimen Virtual 2: Gerak Lurus Berubah Beraturan (GLBB)</div>
+                
+                <div class="inquiry-variables-bar">
+                    <div class="inquiry-box"><strong>Variabel Bebas:</strong> Percepatan ($a$), Waktu ($t$)</div>
+                    <div class="inquiry-box"><strong>Variabel Terikat:</strong> Kecepatan Akhir ($v_t$), Posisi ($s$)</div>
+                    <div class="inquiry-box"><strong>Variabel Kontrol:</strong> Kecepatan Awal ($v_0$)</div>
+                    <div class="inquiry-box"><strong>Karakteristik:</strong> Kecepatan Berubah Teratur</div>
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="canvasGLBB"></canvas>
+                </div>
+
+                <div class="dashboard-realtime">
+                    <div class="dash-item"><div class="val" id="glbb-dash-t">0.0 s</div><div class="lbl">Waktu (t)</div></div>
+                    <div class="dash-item"><div class="val" id="glbb-dash-s">0.0 m</div><div class="lbl">Posisi (s)</div></div>
+                    <div class="dash-item"><div class="val" id="glbb-dash-v">0.0 m/s</div><div class="lbl">Kecepatan ($v_t$)</div></div>
+                    <div class="dash-item"><div class="val" id="glbb-dash-a">2.0 m/s²</div><div class="lbl">Percepatan (a)</div></div>
+                </div>
+
+                <div class="grid-2">
+                    <div>
+                        <div class="form-group">
+                            <label>Kecepatan Awal ($v_0$): <span id="glbb-v0-val">0</span> m/s</label>
+                            <input type="range" class="form-control" id="glbb-v0-input" min="0" max="15" value="0" oninput="updateGLBBParams()">
+                        </div>
+                        <div class="form-group">
+                            <label>Percepatan ($a$): <span id="glbb-a-val">2.0</span> m/s²</label>
+                            <input type="range" class="form-control" id="glbb-a-input" min="-5" max="5" step="0.5" value="2" oninput="updateGLBBParams()">
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; justify-content: center; gap: 10px;">
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn" onclick="startSim('GLBB')">▶️ MULAI</button>
+                            <button class="btn btn-secondary" onclick="pauseSim('GLBB')">⏸️ PAUSE</button>
+                            <button class="btn btn-secondary" onclick="resetSim('GLBB')">⏪ RESET</button>
+                            <button class="btn btn-success" onclick="recordData('GLBB')">📌 CATAT DATA</button>
+                        </div>
+                        <button class="btn btn-secondary" style="margin-top: 5px;" onclick="generateRandomExp('GLBB')">🎲 GENERATE EXPERIMENT</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABEL DATA GLBB -->
+            <div class="card">
+                <div class="card-header">📋 Tabel Data Pengamatan GLBB</div>
+                <div class="table-responsive">
+                    <table id="table-glbb">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Kecepatan Awal v₀ (m/s)</th>
+                                <th>Percepatan a (m/s²)</th>
+                                <th>Waktu t (s)</th>
+                                <th>Kecepatan Akhir vₜ (m/s)</th>
+                                <th>Posisi s (m)</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody><!-- JS Render --></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. SIMULASI DUA BENDA (PERBANDINGAN) -->
+        <section id="sec-exp-duabenda" class="section-page">
+            <div class="card">
+                <div class="card-header">🏁 Simulasi Perbandingan Dua Benda (GLB vs GLBB)</div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Amati secara langsung perbedaan akumulasi posisi antara Benda A (GLB) dan Benda B (GLBB) pada lintasan yang sama!</p>
+                
+                <div class="canvas-container">
+                    <canvas id="canvasDuaBenda"></canvas>
+                </div>
+
+                <div class="dashboard-realtime">
+                    <div class="dash-item"><div class="val" id="db-dash-t">0.0 s</div><div class="lbl">Waktu (t)</div></div>
+                    <div class="dash-item"><div class="val" id="db-dash-sA" style="color: var(--primary);">0.0 m</div><div class="lbl">Posisi Benda A (GLB)</div></div>
+                    <div class="dash-item"><div class="val" id="db-dash-sB" style="color: var(--secondary);">0.0 m</div><div class="lbl">Posisi Benda B (GLBB)</div></div>
+                </div>
+
+                <div class="grid-2">
+                    <div>
+                        <h4 style="color: var(--primary);">🚗 Benda A (GLB)</h4>
+                        <div class="form-group">
+                            <label>Kecepatan Konstan ($v$): <span id="db-vA-val">6</span> m/s</label>
+                            <input type="range" class="form-control" id="db-vA-input" min="1" max="15" value="6">
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--secondary);">🏎️ Benda B (GLBB)</h4>
+                        <div class="form-group">
+                            <label>Kecepatan Awal ($v_0$): <span id="db-v0B-val">0</span> m/s</label>
+                            <input type="range" class="form-control" id="db-v0B-input" min="0" max="10" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Percepatan ($a$): <span id="db-aB-val">2</span> m/s²</label>
+                            <input type="range" class="form-control" id="db-aB-input" min="0.5" max="4" step="0.5" value="2">
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn" onclick="startSimDuaBenda()">▶️ MULAI BALAPAN</button>
+                    <button class="btn btn-secondary" onclick="resetSimDuaBenda()">⏪ RESET</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. GRAFIK INTERAKTIF -->
+        <section id="sec-grafik" class="section-page">
+            <div class="card">
+                <div class="card-header">📊 Plot Grafik Interaktif Native HTML5 Canvas</div>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn" onclick="renderGraph('st')">Grafik Posisi vs Waktu (s - t)</button>
+                    <button class="btn btn-secondary" onclick="renderGraph('vt')">Grafik Kecepatan vs Waktu (v - t)</button>
+                    <button class="btn btn-secondary" onclick="playGraphPlayback()">▶️ PLAYBACK DATA</button>
+                </div>
+
+                <div class="grid-2">
+                    <div>
+                        <h4 style="color: var(--primary); text-align: center; margin-bottom: 8px;" id="graph-title-1">Grafik Posisi - Waktu (s - t)</h4>
+                        <div class="canvas-container" style="height: 280px;">
+                            <canvas id="canvasGraph1" height="280"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--secondary); text-align: center; margin-bottom: 8px;" id="graph-title-2">Grafik Kecepatan - Waktu (v - t)</h4>
+                        <div class="canvas-container" style="height: 280px;">
+                            <canvas id="canvasGraph2" height="280"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 9. TANTANGAN INVESTIGASI -->
+        <section id="sec-tantangan" class="section-page">
+            <div class="card">
+                <div class="card-header">🎯 Tantangan Investigasi Ilmiah</div>
+                <div id="challenge-list-container"></div>
+            </div>
+        </section>
+
+        <!-- 10. LKPD ONLINE INTEGRITAS -->
+        <section id="sec-lkpd" class="section-page">
+            <div class="card">
+                <div class="card-header">📄 LEMBAR KERJA PESERTA DIDIK (LKPD) ONLINE</div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">Isi seluruh data identitas, prediksi, dan analisis di bawah ini. Semua data tersimpan otomatis di browservmu.</p>
+                
+                <!-- IDENTITAS -->
+                <div style="background: #0f172a; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color);">
+                    <h4 style="color: var(--primary); margin-bottom: 10px;">A. Identitas Siswa</h4>
+                    <div class="grid-3">
+                        <div class="form-group">
+                            <label>Nama Lengkap:</label>
+                            <input type="text" id="lkpd-nama" class="form-control" placeholder="Nama siswa..." onchange="saveLKPD()">
+                        </div>
+                        <div class="form-group">
+                            <label>Kelas:</label>
+                            <input type="text" id="lkpd-kelas" class="form-control" value="8" onchange="saveLKPD()">
+                        </div>
+                        <div class="form-group">
+                            <label>Tanggal Eksperimen:</label>
+                            <input type="date" id="lkpd-tanggal" class="form-control" onchange="saveLKPD()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PREDIKSI SISWA -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: var(--primary); margin-bottom: 10px;">B. Pertanyaan Pemantik & Prediksi</h4>
+                    <div class="form-group">
+                        <label>1. Jika kecepatan sebuah mobil diperbesar menjadi 2 kali lipat sedangkan waktunya sama, bagaimana jarak yang ditempuh mobil tersebut?</label>
+                        <textarea id="lkpd-prediksi-1" class="form-control" placeholder="Tuliskan prediksimu di sini..." onchange="saveLKPD()"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>2. Menurutmu, apakah benda yang mengalami GLBB selalu bergerak semakin cepat? Jelaskan alasanmu!</label>
+                        <textarea id="lkpd-prediksi-2" class="form-control" placeholder="Tuliskan prediksimu di sini..." onchange="saveLKPD()"></textarea>
+                    </div>
+                </div>
+
+                <!-- ANALISIS DATA OTOMATIS -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: var(--primary); margin-bottom: 10px;">C. Analisis Data & Pertanyaan Diskusi</h4>
+                    
+                    <div class="form-group">
+                        <label>1. Berdasarkan data eksperimen GLB yang kamu catat, bagaimana nilai kecepatan dari waktu ke waktu?</label>
+                        <textarea id="lkpd-analisis-1" class="form-control" placeholder="Jawab berdasarkan data..." onchange="saveLKPD()"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>2. Pada eksperimen GLBB, apa yang terjadi pada bentuk grafik v-t ketika percepatan bernilai positif vs bernilai negatif?</label>
+                        <textarea id="lkpd-analisis-2" class="form-control" placeholder="Jawab berdasarkan grafik..." onchange="saveLKPD()"></textarea>
+                    </div>
+
+                    <!-- CEK PERHITUNGAN INTERAKTIF -->
+                    <div class="callout callout-warning">
+                        <strong>🧮 Fitur Cek Perhitungan Mandiri:</strong>
+                        <p style="font-size: 0.85rem; margin-top: 5px;">Berdasarkan salah satu data GLB-mu ($v = 4 \text{ m/s}$, $t = 5 \text{ s}$), berapa jarak total yang ditempuh ($s$)?</p>
+                        <div style="display: flex; gap: 10px; margin-top: 10px; align-items: center;">
+                            <input type="number" id="calc-check-input" class="form-control" style="width: 120px;" placeholder="Nilai s (m)">
+                            <button class="btn btn-secondary" onclick="checkCalculation()">CEK JAWABAN</button>
+                            <span id="calc-check-feedback" style="font-weight: bold; font-size: 0.85rem;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KESIMPULAN OTOMATIS -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: var(--primary); margin-bottom: 10px;">D. Kesimpulan Investigasi</h4>
+                    <div class="form-group">
+                        <label>Buatlah kesimpulan umum mengenai perbedaan utama antara GLB dan GLBB berbasis data eksperimenmu!</label>
+                        <textarea id="lkpd-kesimpulan" class="form-control" placeholder="Tuliskan kesimpulan menyeluruh..." onchange="saveLKPD()"></textarea>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn" onclick="saveLKPD(true)">💾 Simpan LKPD</button>
+                    <button class="btn btn-secondary" onclick="window.print()">🖨️ CETAK / SIMPAN PDF</button>
+                    <button class="btn btn-secondary" onclick="exportJSON()">📥 Export Data (.JSON)</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 11. KUIS EVALUASI (C2-C4) -->
+        <section id="sec-kuis" class="section-page">
+            <div class="card">
+                <div class="card-header">✍️ Kuis Evaluasi Pemahaman (15 Soal C2-C4)</div>
+                <div id="quiz-container"></div>
+                <button class="btn" style="margin-top: 20px;" onclick="submitQuiz()">Kirim & Hitung Nilai Kuis</button>
+                <div id="quiz-result" class="callout" style="display: none; margin-top: 20px;"></div>
+            </div>
+        </section>
+
+        <!-- 12. REFLEKSI SISWA -->
+        <section id="sec-refleksi" class="section-page">
+            <div class="card">
+                <div class="card-header">💭 Refleksi Pembelajaran Siswa</div>
+                <div class="form-group">
+                    <label>1. Konsep mana yang paling kamu kuasai setelah melakukan eksperimen ini?</label>
+                    <textarea id="refl-1" class="form-control" onchange="saveRefleksi()"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>2. Bagian mana dari eksperimen/grafik yang masih terasa membingungkan?</label>
+                    <textarea id="refl-2" class="form-control" onchange="saveRefleksi()"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>3. Sebutkan contoh peristiwa GLB dan GLBB yang sering kamu temui dalam kehidupan sehari-hari!</label>
+                    <textarea id="refl-3" class="form-control" onchange="saveRefleksi()"></textarea>
+                </div>
+                <button class="btn" onclick="saveRefleksi(true)">💾 Simpan Refleksi</button>
+            </div>
+        </section>
+
+        <!-- 13. REKAP HASIL & NILAI -->
+        <section id="sec-hasil" class="section-page">
+            <div class="card">
+                <div class="card-header">🏆 Rekapitulasi Hasil & Nilai Akhir Pembelajaran</div>
+                <div id="rekap-nilai-card" class="grid-2">
+                    <!-- JS Render Score Breakdown -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 14. MODE GURU & DOKUMENTASI LOKAL -->
+        <section id="sec-guru" class="section-page">
+            <div class="card">
+                <div class="card-header">👨‍🏫 Mode Guru & Manajemen Data Lokal</div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Aplikasi ini berjalan 100% Client-Side tanpa backend server. Seluruh progress tersimpan secara lokal di browser perangkat ini (localStorage).</p>
+                
+                <div class="callout">
+                    <strong>📌 Informasi Penilaian Terbobot:</strong>
+                    <ul style="margin-left: 20px; font-size: 0.85rem;">
+                        <li>Pre-Test Diagnostik: 10%</li>
+                        <li>Aktivitas Eksperimen & Data: 30%</li>
+                        <li>Analisis Data LKPD: 25%</li>
+                        <li>Kuis Evaluasi (15 Soal): 25%</li>
+                        <li>Refleksi Siswa: 10%</li>
+                    </ul>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="loadDataFromStorage()">🔄 Load Data Terakhir</button>
+                    <button class="btn btn-danger" onclick="clearAllData()">⚠️ Reset Semua Data Praktikum</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ==========================================================================
+       4. JAVASCRIPT ENGINE (PHYSICS SIMULATION, CANVAS, GRAPH, LKPD ENGINE)
+       ========================================================================== -->
+    <script>
+        /* --- STATE MANAGEMENT --- */
+        const APP_STATE = {
+            currentStep: 1,
+            totalSteps: 8,
+            soundEnabled: false,
+            dataGLB: [],
+            dataGLBB: [],
+            pretestScore: 0,
+            quizScore: 0,
+            calcCheckAttempts: 0,
+            simGLB: { active: false, animId: null, t: 0, s: 0, v: 5, s0: 0 },
+            simGLBB: { active: false, animId: null, t: 0, s: 0, v0: 0, a: 2, vt: 0 },
+            simDua: { active: false, animId: null, t: 0, sA: 0, sB: 0, vA: 6, v0B: 0, aB: 2 }
+        };
+
+        /* --- WEB AUDIO API (SYNTHETIC SOUNDS - NO EXTERNAL FILES) --- */
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function playSound(type) {
+            if (!APP_STATE.soundEnabled) return;
+            if (!audioCtx) audioCtx = new AudioCtx();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+            if (type === 'click') {
+                osc.frequency.setValueAtTime(400, now);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now); osc.stop(now + 0.05);
+            } else if (type === 'correct') {
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.08);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now); osc.stop(now + 0.25);
+            } else if (type === 'wrong') {
+                osc.frequency.setValueAtTime(220, now);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+            }
+        }
+
+        function toggleSound(val) {
+            APP_STATE.soundEnabled = val;
+            if (val) playSound('click');
+        }
+
+        /* --- ROUTING & NAVIGATION --- */
+        function navigateTo(secId) {
+            playSound('click');
+            document.querySelectorAll('.section-page').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+
+            const targetSec = document.getElementById('sec-' + secId);
+            if (targetSec) targetSec.classList.add('active');
+
+            const activeNav = document.querySelector(`.nav-links a[href="#${secId}"]`);
+            if (activeNav) activeNav.classList.add('active');
+
+            // Update Header Title
+            const titles = {
+                'beranda': 'BERANDA LABORATORIUM',
+                'tujuan': 'TUJUAN & ALUR INQUIRY',
+                'pretest': 'PRE-TEST DIAGNOSTIK',
+                'materi': 'BANTUAN KONSEP & RUMUS',
+                'exp-glb': 'EKSPERIMEN 1: GLB',
+                'exp-glbb': 'EKSPERIMEN 2: GLBB',
+                'exp-duabenda': 'SIMULASI DUA BENDA',
+                'grafik': 'VISUALISASI GRAFIK',
+                'tantangan': 'TANTANGAN INVESTIGASI',
+                'lkpd': 'LKPD ONLINE INTEGRITAS',
+                'kuis': 'KUIS EVALUASI',
+                'refleksi': 'REFLEKSI SISWA',
+                'hasil': 'REKAP HASIL & NILAI',
+                'guru': 'MODE GURU'
+            };
+            document.getElementById('page-title').innerText = titles[secId] || 'LABORATORIUM GERAK LURUS';
+            
+            // Trigger specific renders
+            if (secId === 'exp-glb') initCanvasGLB();
+            if (secId === 'exp-glbb') initCanvasGLBB();
+            if (secId === 'exp-duabenda') initCanvasDuaBenda();
+            if (secId === 'grafik') renderGraph('st');
+            if (secId === 'hasil') renderRekapHasil();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* --- PRE-TEST DATA & LOGIC --- */
+        const PRETEST_DATA = [
+            { id: 1, q: "Sebuah mobil bergerak dengan kecepatan tetap 10 m/s selama 5 detik. Jarak yang ditempuh mobil adalah...", opts: ["15 m", "50 m", "2 m", "100 m"], ans: 1 },
+            { id: 2, q: "Karakteristik utama dari Gerak Lurus Beraturan (GLB) adalah...", opts: ["Kecepatan berubah teratur", "Percepatan bernilai nol", "Lintasan berbentuk lingkaran", "Kecepatan terus bertambah"], ans: 1 },
+            { id: 3, q: "Perbedaan utama antara jarak dan perpindahan terletak pada...", opts: ["Jarak punya arah, perpindahan tidak", "Jarak adalah besaran vektor, perpindahan skalar", "Perpindahan memperhatikan arah dan posisi awal-akhir", "Jarak selalu lebih kecil dari perpindahan"], ans: 2 },
+            { id: 4, q: "Jika grafik kecepatan-waktu ($v-t$) berupa garis lurus mendatar (horizontal), maka benda mengalami...", opts: ["GLB", "GLBB Dipercepat", "GLBB Diperlambat", "Benda Diam"], ans: 0 },
+            { id: 5, q: "Sebuah sepeda bergerak dari keadaan diam dengan percepatan $2 \\text{ m/s}^2$. Kecepatan sepeda setelah 3 detik adalah...", opts: ["5 m/s", "6 m/s", "1.5 m/s", "12 m/s"], ans: 1 }
+        ];
+
+        function renderPreTest() {
+            const container = document.getElementById('pretest-questions-container');
+            container.innerHTML = PRETEST_DATA.map((item, idx) => `
+                <div style="margin-bottom: 15px; background: #0f172a; padding: 12px; border-radius: 8px;">
+                    <p style="font-size: 0.9rem; font-weight: 600;">${idx + 1}. ${item.q}</p>
+                    <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
+                        ${item.opts.map((opt, oIdx) => `
+                            <label style="font-size: 0.85rem; cursor: pointer;">
+                                <input type="radio" name="pretest-${item.id}" value="${oIdx}"> ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function submitPreTest() {
+            let correct = 0;
+            PRETEST_DATA.forEach(item => {
+                const checked = document.querySelector(`input[name="pretest-${item.id}"]:checked`);
+                if (checked && parseInt(checked.value) === item.ans) correct++;
+            });
+            APP_STATE.pretestScore = (correct / PRETEST_DATA.length) * 100;
+            playSound('correct');
+
+            const resDiv = document.getElementById('pretest-result');
+            resDiv.style.display = 'block';
+            resDiv.innerHTML = `<strong>Hasil Pre-Test:</strong> Skor kamu ${APP_STATE.pretestScore}/100 (${correct} Benar dari 5 Soal). Silakan lanjut ke eksperimen!`;
+            saveToStorage();
+        }
+
+        /* --- CANVAS SIMULATION ENGINE (GLB) --- */
+        function initCanvasGLB() {
+            const canvas = document.getElementById('canvasGLB');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = 220;
+            drawScene(ctx, canvas.width, canvas.height, APP_STATE.simGLB.s, 'GLB');
+        }
+
+        function updateGLBParams() {
+            APP_STATE.simGLB.v = parseFloat(document.getElementById('glb-v-input').value);
+            APP_STATE.simGLB.s0 = parseFloat(document.getElementById('glb-s0-input').value);
+            document.getElementById('glb-v-val').innerText = APP_STATE.simGLB.v;
+            document.getElementById('glb-s0-val').innerText = APP_STATE.simGLB.s0;
+            document.getElementById('glb-dash-v').innerText = APP_STATE.simGLB.v.toFixed(1) + ' m/s';
+            if (!APP_STATE.simGLB.active) {
+                APP_STATE.simGLB.s = APP_STATE.simGLB.s0;
+                document.getElementById('glb-dash-s').innerText = APP_STATE.simGLB.s.toFixed(1) + ' m';
+                initCanvasGLB();
+            }
+        }
+
+        function startSim(type) {
+            playSound('click');
+            if (type === 'GLB') {
+                if (APP_STATE.simGLB.active) return;
+                APP_STATE.simGLB.active = true;
+                let lastTime = performance.now();
+
+                function loop(now) {
+                    if (!APP_STATE.simGLB.active) return;
+                    const dt = (now - lastTime) / 1000;
+                    lastTime = now;
+
+                    APP_STATE.simGLB.t += dt;
+                    APP_STATE.simGLB.s = APP_STATE.simGLB.s0 + (APP_STATE.simGLB.v * APP_STATE.simGLB.t);
+
+                    // Update Dash
+                    document.getElementById('glb-dash-t').innerText = APP_STATE.simGLB.t.toFixed(1) + ' s';
+                    document.getElementById('glb-dash-s').innerText = APP_STATE.simGLB.s.toFixed(1) + ' m';
+
+                    const canvas = document.getElementById('canvasGLB');
+                    const ctx = canvas.getContext('2d');
+                    drawScene(ctx, canvas.width, canvas.height, APP_STATE.simGLB.s, 'GLB');
+
+                    // Auto Stop at edge
+                    if (APP_STATE.simGLB.s >= 100) {
+                        pauseSim('GLB');
+                        return;
+                    }
+                    APP_STATE.simGLB.animId = requestAnimationFrame(loop);
+                }
+                APP_STATE.simGLB.animId = requestAnimationFrame(loop);
+            } else if (type === 'GLBB') {
+                if (APP_STATE.simGLBB.active) return;
+                APP_STATE.simGLBB.active = true;
+                let lastTime = performance.now();
+
+                function loop(now) {
+                    if (!APP_STATE.simGLBB.active) return;
+                    const dt = (now - lastTime) / 1000;
+                    lastTime = now;
+
+                    APP_STATE.simGLBB.t += dt;
+                    const v0 = APP_STATE.simGLBB.v0;
+                    const a = APP_STATE.simGLBB.a;
+                    const t = APP_STATE.simGLBB.t;
+
+                    APP_STATE.simGLBB.vt = v0 + (a * t);
+                    APP_STATE.simGLBB.s = (v0 * t) + (0.5 * a * t * t);
+
+                    // Prevent negative velocity/position in simple demo
+                    if (APP_STATE.simGLBB.vt < 0) APP_STATE.simGLBB.vt = 0;
+                    if (APP_STATE.simGLBB.s < 0) APP_STATE.simGLBB.s = 0;
+
+                    document.getElementById('glbb-dash-t').innerText = t.toFixed(1) + ' s';
+                    document.getElementById('glbb-dash-s').innerText = APP_STATE.simGLBB.s.toFixed(1) + ' m';
+                    document.getElementById('glbb-dash-v').innerText = APP_STATE.simGLBB.vt.toFixed(1) + ' m/s';
+
+                    const canvas = document.getElementById('canvasGLBB');
+                    const ctx = canvas.getContext('2d');
+                    drawScene(ctx, canvas.width, canvas.height, APP_STATE.simGLBB.s, 'GLBB');
+
+                    if (APP_STATE.simGLBB.s >= 100) {
+                        pauseSim('GLBB');
+                        return;
+                    }
+                    APP_STATE.simGLBB.animId = requestAnimationFrame(loop);
+                }
+                APP_STATE.simGLBB.animId = requestAnimationFrame(loop);
+            }
+        }
+
+        function pauseSim(type) {
+            playSound('click');
+            if (type === 'GLB') {
+                APP_STATE.simGLB.active = false;
+                cancelAnimationFrame(APP_STATE.simGLB.animId);
+            } else if (type === 'GLBB') {
+                APP_STATE.simGLBB.active = false;
+                cancelAnimationFrame(APP_STATE.simGLBB.animId);
+            }
+        }
+
+        function resetSim(type) {
+            playSound('click');
+            pauseSim(type);
+            if (type === 'GLB') {
+                APP_STATE.simGLB.t = 0;
+                APP_STATE.simGLB.s = APP_STATE.simGLB.s0;
+                document.getElementById('glb-dash-t').innerText = '0.0 s';
+                document.getElementById('glb-dash-s').innerText = APP_STATE.simGLB.s0.toFixed(1) + ' m';
+                initCanvasGLB();
+            } else if (type === 'GLBB') {
+                APP_STATE.simGLBB.t = 0;
+                APP_STATE.simGLBB.s = 0;
+                APP_STATE.simGLBB.vt = APP_STATE.simGLBB.v0;
+                document.getElementById('glbb-dash-t').innerText = '0.0 s';
+                document.getElementById('glbb-dash-s').innerText = '0.0 m';
+                document.getElementById('glbb-dash-v').innerText = APP_STATE.simGLBB.v0.toFixed(1) + ' m/s';
+                initCanvasGLBB();
+            }
+        }
+
+        /* --- CANVAS SIMULATION ENGINE (GLBB) --- */
+        function initCanvasGLBB() {
+            const canvas = document.getElementById('canvasGLBB');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = 220;
+            drawScene(ctx, canvas.width, canvas.height, APP_STATE.simGLBB.s, 'GLBB');
+        }
+
+        function updateGLBBParams() {
+            APP_STATE.simGLBB.v0 = parseFloat(document.getElementById('glbb-v0-input').value);
+            APP_STATE.simGLBB.a = parseFloat(document.getElementById('glbb-a-input').value);
+            document.getElementById('glbb-v0-val').innerText = APP_STATE.simGLBB.v0;
+            document.getElementById('glbb-a-val').innerText = APP_STATE.simGLBB.a;
+            document.getElementById('glbb-dash-a').innerText = APP_STATE.simGLBB.a.toFixed(1) + ' m/s²';
+            if (!APP_STATE.simGLBB.active) {
+                document.getElementById('glbb-dash-v').innerText = APP_STATE.simGLBB.v0.toFixed(1) + ' m/s';
+                initCanvasGLBB();
+            }
+        }
+
+        /* --- GENERIC CANVAS RENDERER --- */
+        function drawScene(ctx, width, height, positionMeters, label) {
+            ctx.clearRect(0, 0, width, height);
+
+            // Track background / Grid
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < width; x += 40) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+            }
+
+            // Road Line
+            const roadY = height - 60;
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, roadY, width, 40);
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillRect(0, roadY, width, 3);
+
+            // Distance Markers (Scale: 1 meter = 8 pixels)
+            const scale = 8;
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '10px monospace';
+            for (let m = 0; m <= 100; m += 10) {
+                const posX = 40 + (m * scale);
+                if (posX < width) {
+                    ctx.fillRect(posX, roadY, 2, 8);
+                    ctx.fillText(m + 'm', posX - 8, roadY + 22);
+                }
+            }
+
+            // Draw Object (Car/Robot)
+            const objX = 40 + (positionMeters * scale);
+            const objY = roadY - 25;
+
+            // Car Body
+            ctx.fillStyle = label === 'GLB' ? '#38bdf8' : '#818cf8';
+            ctx.beginPath();
+            ctx.roundRect(objX - 20, objY, 40, 20, 5);
+            ctx.fill();
+
+            // Car Roof
+            ctx.fillStyle = '#06b6d4';
+            ctx.fillRect(objX - 10, objY - 10, 20, 10);
+
+            // Wheels
+            ctx.fillStyle = '#f8fafc';
+            ctx.beginPath(); ctx.arc(objX - 12, objY + 20, 5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(objX + 12, objY + 20, 5, 0, Math.PI * 2); ctx.fill();
+
+            // Label
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 11px sans-serif';
+            ctx.fillText(label, objX - 12, objY - 15);
+        }
+
+        /* --- DUAL OBJECT COMPARISON SIMULATION --- */
+        function initCanvasDuaBenda() {
+            const canvas = document.getElementById('canvasDuaBenda');
+            if (!canvas) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = 220;
+            drawDualScene();
+        }
+
+        function startSimDuaBenda() {
+            playSound('click');
+            if (APP_STATE.simDua.active) return;
+            APP_STATE.simDua.active = true;
+            APP_STATE.simDua.vA = parseFloat(document.getElementById('db-vA-input').value);
+            APP_STATE.simDua.v0B = parseFloat(document.getElementById('db-v0B-input').value);
+            APP_STATE.simDua.aB = parseFloat(document.getElementById('db-aB-input').value);
+
+            let lastTime = performance.now();
+            function loop(now) {
+                if (!APP_STATE.simDua.active) return;
+                const dt = (now - lastTime) / 1000;
+                lastTime = now;
+
+                APP_STATE.simDua.t += dt;
+                const t = APP_STATE.simDua.t;
+
+                APP_STATE.simDua.sA = APP_STATE.simDua.vA * t;
+                APP_STATE.simDua.sB = (APP_STATE.simDua.v0B * t) + (0.5 * APP_STATE.simDua.aB * t * t);
+
+                document.getElementById('db-dash-t').innerText = t.toFixed(1) + ' s';
+                document.getElementById('db-dash-sA').innerText = APP_STATE.simDua.sA.toFixed(1) + ' m';
+                document.getElementById('db-dash-sB').innerText = APP_STATE.simDua.sB.toFixed(1) + ' m';
+
+                drawDualScene();
+
+                if (APP_STATE.simDua.sA >= 100 || APP_STATE.simDua.sB >= 100) {
+                    APP_STATE.simDua.active = false;
+                    return;
+                }
+                APP_STATE.simDua.animId = requestAnimationFrame(loop);
+            }
+            APP_STATE.simDua.animId = requestAnimationFrame(loop);
+        }
+
+        function resetSimDuaBenda() {
+            playSound('click');
+            APP_STATE.simDua.active = false;
+            cancelAnimationFrame(APP_STATE.simDua.animId);
+            APP_STATE.simDua.t = 0;
+            APP_STATE.simDua.sA = 0;
+            APP_STATE.simDua.sB = 0;
+            document.getElementById('db-dash-t').innerText = '0.0 s';
+            document.getElementById('db-dash-sA').innerText = '0.0 m';
+            document.getElementById('db-dash-sB').innerText = '0.0 m';
+            initCanvasDuaBenda();
+        }
+
+        function drawDualScene() {
+            const canvas = document.getElementById('canvasDuaBenda');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            // Track 1
+            ctx.fillStyle = '#1e293b'; ctx.fillRect(0, 40, w, 30);
+            ctx.fillStyle = '#38bdf8'; ctx.fillText('BENDA A (GLB)', 10, 30);
+            // Track 2
+            ctx.fillStyle = '#1e293b'; ctx.fillRect(0, 130, w, 30);
+            ctx.fillStyle = '#818cf8'; ctx.fillText('BENDA B (GLBB)', 10, 120);
+
+            const scale = 7;
+            const posA = 40 + (APP_STATE.simDua.sA * scale);
+            const posB = 40 + (APP_STATE.simDua.sB * scale);
+
+            // Car A
+            ctx.fillStyle = '#38bdf8'; ctx.fillRect(posA - 15, 45, 30, 20);
+            // Car B
+            ctx.fillStyle = '#818cf8'; ctx.fillRect(posB - 15, 135, 30, 20);
+        }
+
+        /* --- DATA RECORDING & TABLE RENDERING --- */
+        function recordData(type) {
+            playSound('click');
+            if (type === 'GLB') {
+                const newData = {
+                    no: APP_STATE.dataGLB.length + 1,
+                    v: parseFloat(APP_STATE.simGLB.v.toFixed(1)),
+                    t: parseFloat(APP_STATE.simGLB.t.toFixed(1)),
+                    s: parseFloat(APP_STATE.simGLB.s.toFixed(1)),
+                    a: 0
+                };
+                APP_STATE.dataGLB.push(newData);
+                renderTable('GLB');
+            } else if (type === 'GLBB') {
+                const newData = {
+                    no: APP_STATE.dataGLBB.length + 1,
+                    v0: parseFloat(APP_STATE.simGLBB.v0.toFixed(1)),
+                    a: parseFloat(APP_STATE.simGLBB.a.toFixed(1)),
+                    t: parseFloat(APP_STATE.simGLBB.t.toFixed(1)),
+                    vt: parseFloat(APP_STATE.simGLBB.vt.toFixed(1)),
+                    s: parseFloat(APP_STATE.simGLBB.s.toFixed(1))
+                };
+                APP_STATE.dataGLBB.push(newData);
+                renderTable('GLBB');
+            }
+            saveToStorage();
+        }
+
+        function renderTable(type) {
+            if (type === 'GLB') {
+                const tbody = document.querySelector('#table-glb tbody');
+                tbody.innerHTML = APP_STATE.dataGLB.map((item, idx) => `
+                    <tr>
+                        <td>${item.no}</td>
+                        <td>${item.v}</td>
+                        <td>${item.t}</td>
+                        <td>${item.s}</td>
+                        <td>${item.a}</td>
+                        <td><button class="btn btn-danger" style="padding: 2px 8px; font-size: 0.75rem;" onclick="deleteData('GLB', ${idx})">Hapus</button></td>
+                    </tr>
+                `).join('');
+            } else if (type === 'GLBB') {
+                const tbody = document.querySelector('#table-glbb tbody');
+                tbody.innerHTML = APP_STATE.dataGLBB.map((item, idx) => `
+                    <tr>
+                        <td>${item.no}</td>
+                        <td>${item.v0}</td>
+                        <td>${item.a}</td>
+                        <td>${item.t}</td>
+                        <td>${item.vt}</td>
+                        <td>${item.s}</td>
+                        <td><button class="btn btn-danger" style="padding: 2px 8px; font-size: 0.75rem;" onclick="deleteData('GLBB', ${idx})">Hapus</button></td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function deleteData(type, index) {
+            if (type === 'GLB') {
+                APP_STATE.dataGLB.splice(index, 1);
+                renderTable('GLB');
+            } else {
+                APP_STATE.dataGLBB.splice(index, 1);
+                renderTable('GLBB');
+            }
+            saveToStorage();
+        }
+
+        function generateRandomExp(type) {
+            playSound('click');
+            if (type === 'GLB') {
+                document.getElementById('glb-v-input').value = Math.floor(Math.random() * 15) + 2;
+                updateGLBParams();
+            } else {
+                document.getElementById('glbb-v0-input').value = Math.floor(Math.random() * 5);
+                document.getElementById('glbb-a-input').value = (Math.random() * 4 - 1).toFixed(1);
+                updateGLBBParams();
+            }
+        }
+
+        /* --- NATIVE CANVAS GRAPH PLOTTING ENGINE (NO CDN) --- */
+        function renderGraph(graphType) {
+            playSound('click');
+            const c1 = document.getElementById('canvasGraph1');
+            const c2 = document.getElementById('canvasGraph2');
+            if (!c1 || !c2) return;
+
+            c1.width = c1.parentElement.clientWidth;
+            c2.width = c2.parentElement.clientWidth;
+
+            const ctx1 = c1.getContext('2d');
+            const ctx2 = c2.getContext('2d');
+
+            ctx1.clearRect(0, 0, c1.width, c1.height);
+            ctx2.clearRect(0, 0, c2.width, c2.height);
+
+            // Draw Axes
+            drawGraphAxes(ctx1, c1.width, c1.height, 'Waktu t (s)', 'Posisi s (m)');
+            drawGraphAxes(ctx2, c2.width, c2.height, 'Waktu t (s)', 'Kecepatan v (m/s)');
+
+            // Plot GLB Data (Blue) & GLBB Data (Purple)
+            if (APP_STATE.dataGLB.length > 0) {
+                const pointsS = APP_STATE.dataGLB.map(d => ({ x: d.t, y: d.s }));
+                const pointsV = APP_STATE.dataGLB.map(d => ({ x: d.t, y: d.v }));
+                plotLine(ctx1, c1.width, c1.height, pointsS, '#38bdf8', 'GLB (s-t)');
+                plotLine(ctx2, c2.width, c2.height, pointsV, '#38bdf8', 'GLB (v-t)');
+            }
+
+            if (APP_STATE.dataGLBB.length > 0) {
+                const pointsS = APP_STATE.dataGLBB.map(d => ({ x: d.t, y: d.s }));
+                const pointsV = APP_STATE.dataGLBB.map(d => ({ x: d.t, y: d.vt }));
+                plotLine(ctx1, c1.width, c1.height, pointsS, '#818cf8', 'GLBB (s-t)');
+                plotLine(ctx2, c2.width, c2.height, pointsV, '#818cf8', 'GLBB (v-t)');
+            }
+        }
+
+        function drawGraphAxes(ctx, w, h, xLabel, yLabel) {
+            const pad = 40;
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1;
+
+            // Y Axis
+            ctx.beginPath(); ctx.moveTo(pad, 20); ctx.lineTo(pad, h - pad); ctx.stroke();
+            // X Axis
+            ctx.beginPath(); ctx.moveTo(pad, h - pad); ctx.lineTo(w - 20, h - pad); ctx.stroke();
+
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '10px sans-serif';
+            ctx.fillText(xLabel, w - 80, h - 10);
+            ctx.fillText(yLabel, 10, 15);
+        }
+
+        function plotLine(ctx, w, h, points, color, label) {
+            const pad = 40;
+            const maxRealX = 15;
+            const maxRealY = 80;
+
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            points.forEach((pt, idx) => {
+                const mapX = pad + (pt.x / maxRealX) * (w - pad - 30);
+                const mapY = (h - pad) - (pt.y / maxRealY) * (h - pad - 30);
+
+                if (idx === 0) ctx.moveTo(mapX, mapY);
+                else ctx.lineTo(mapX, mapY);
+
+                // Draw Point
+                ctx.arc(mapX, mapY, 3, 0, Math.PI * 2);
+            });
+            ctx.stroke();
+        }
+
+        function playGraphPlayback() {
+            playSound('click');
+            let frame = 0;
+            const interval = setInterval(() => {
+                frame++;
+                renderGraph('st');
+                if (frame >= 10) clearInterval(interval);
+            }, 100);
+        }
+
+        /* --- TANTANGAN INVESTIGASI --- */
+        const CHALLENGES = [
+            { id: 1, title: "Tantangan 1: GLB Presisi Jarak", desc: "Atur parameter GLB agar benda menempuh jarak TEPAT 20 meter dalam waktu 4 detik!", targetV: 5 },
+            { id: 2, title: "Tantangan 2: GLBB Target Kecepatan", desc: "Atur GLBB dari keadaan diam ($v_0 = 0$) agar kecepatan akhir mencapai TEPAT 12 m/s setelah 4 detik!", targetA: 3 }
+        ];
+
+        function renderChallenges() {
+            const container = document.getElementById('challenge-list-container');
+            container.innerHTML = CHALLENGES.map(c => `
+                <div class="callout" style="margin-bottom: 15px;">
+                    <strong>${c.title}</strong>
+                    <p style="font-size: 0.85rem; margin-top: 4px;">${c.desc}</p>
+                    <button class="btn btn-secondary" style="margin-top: 8px; font-size: 0.8rem;" onclick="checkChallenge(${c.id})">VERIFIKASI HASIL</button>
+                    <span id="ch-feedback-${c.id}" style="margin-left: 10px; font-weight: bold; font-size: 0.85rem;"></span>
+                </div>
+            `).join('');
+        }
+
+        function checkChallenge(id) {
+            const fb = document.getElementById(`ch-feedback-${id}`);
+            if (id === 1) {
+                if (APP_STATE.simGLB.v === 5) {
+                    fb.innerText = "✓ BERHASIL! Kecepatan = 5 m/s";
+                    fb.style.color = "var(--accent-green)";
+                    playSound('correct');
+                } else {
+                    fb.innerText = "❌ Belum tepat. Formula: v = s / t = 20 / 4 = 5 m/s";
+                    fb.style.color = "var(--accent-red)";
+                    playSound('wrong');
+                }
+            } else if (id === 2) {
+                if (APP_STATE.simGLBB.a === 3 && APP_STATE.simGLBB.v0 === 0) {
+                    fb.innerText = "✓ BERHASIL! Percepatan = 3 m/s²";
+                    fb.style.color = "var(--accent-green)";
+                    playSound('correct');
+                } else {
+                    fb.innerText = "❌ Belum tepat. Formula: a = vt / t = 12 / 4 = 3 m/s²";
+                    fb.style.color = "var(--accent-red)";
+                    playSound('wrong');
+                }
+            }
+        }
+
+        /* --- LKPD & CALCULATION CHECK ENGINE --- */
+        function checkCalculation() {
+            const val = parseFloat(document.getElementById('calc-check-input').value);
+            const fb = document.getElementById('calc-check-feedback');
+            APP_STATE.calcCheckAttempts++;
+
+            if (val === 20) {
+                fb.innerText = "✓ Benar! s = v x t = 4 x 5 = 20 meter.";
+                fb.style.color = "var(--accent-green)";
+                playSound('correct');
+            } else {
+                if (APP_STATE.calcCheckAttempts < 2) {
+                    fb.innerText = "❌ Belum tepat. Clue: Gunakan rumus s = v x t.";
+                    fb.style.color = "var(--accent-yellow)";
+                } else {
+                    fb.innerText = "❌ Belum tepat. Jawaban benar adalah 20 m.";
+                    fb.style.color = "var(--accent-red)";
+                }
+                playSound('wrong');
+            }
+        }
+
+        function saveLKPD(showAlert = false) {
+            const lkpdData = {
+                nama: document.getElementById('lkpd-nama').value,
+                kelas: document.getElementById('lkpd-kelas').value,
+                tanggal: document.getElementById('lkpd-tanggal').value,
+                p1: document.getElementById('lkpd-prediksi-1').value,
+                p2: document.getElementById('lkpd-prediksi-2').value,
+                a1: document.getElementById('lkpd-analisis-1').value,
+                a2: document.getElementById('lkpd-analisis-2').value,
+                kesimpulan: document.getElementById('lkpd-kesimpulan').value
+            };
+            localStorage.setItem('LAB_GERAK_LKPD', JSON.stringify(lkpdData));
+            if (showAlert) {
+                playSound('correct');
+                alert('Data LKPD berhasil disimpan secara lokal!');
+            }
+        }
+
+        /* --- KUIS EVALUASI (15 SOAL C2-C4) --- */
+        const QUIZ_DATA = [
+            { id: 1, q: "Sebuah bus bergerak lurus dengan kecepatan konstan 20 m/s. Dalam waktu 10 detik, perpindahan bus tersebut adalah...", opts: ["100 m", "200 m", "2 m", "400 m"], ans: 1 },
+            { id: 2, q: "Grafik posisi terhadap waktu ($s-t$) pada GLB menunjukkan garis lurus miring ke atas. Kemiringan (gradient) garis tersebut merepresentasikan...", opts: ["Percepatan", "Kecepatan", "Waktu total", "Jarak tempuh"], ans: 1 },
+            { id: 3, q: "Bu Ani mengendarai mobil dari posisi diam hingga mencapai kecepatan 18 m/s dalam waktu 6 detik. Percepatan rata-rata mobil Bu Ani adalah...", opts: ["3 m/s²", "108 m/s²", "0.33 m/s²", "12 m/s²"], ans: 0 },
+            { id: 4, q: "Buah kelapa jatuh bebas dari pohonnya. Gerak buah kelapa tersebut merupakan contoh...", opts: ["GLB", "GLBB Dipercepat", "GLBB Diperlambat", "Gerak Acak"], ans: 1 },
+            { id: 5, q: "Sebuah kereta api mengalami perlambatan konstan sebesar $-2 \\text{ m/s}^2$ hingga berhenti. Jika kecepatan awalnya 20 m/s, waktu yang dibutuhkan sampai berhenti adalah...", opts: ["5 detik", "10 detik", "20 detik", "40 detik"], ans: 1 },
+            { id: 6, q: "Seseorang berjalan 4 meter ke timur, kemudian 3 meter ke utara. Nilai jarak dan besar perpindahannya berturut-turut adalah...", opts: ["7 m dan 5 m", "5 m dan 7 m", "7 m dan 7 m", "1 m dan 5 m"], ans: 0 },
+            { id: 7, q: "Percepatan nol ($a = 0$) mengindikasikan bahwa benda...", opts: ["Pasti dalam keadaan diam", "Bergerak dengan kelajuan berubah", "Bergerak dengan kecepatan konstan", "Mengalami gerak melingkar"], ans: 2 },
+            { id: 8, q: "Luas daerah di bawah kurva pada grafik kecepatan-waktu ($v-t$) menyatakan...", opts: ["Percepatan", "Jarak/Perpindahan", "Waktu tempuh", "Gaya gerak"], ans: 1 },
+            { id: 9, q: "Sebuah mobil balap memulai gerak dari v0 = 10 m/s dengan percepatan 4 m/s² selama 5 detik. Kecepatan akhirnya (vt) adalah...", opts: ["20 m/s", "30 m/s", "50 m/s", "14 m/s"], ans: 1 },
+            { id: 10, q: "Grafik v-t pada GLBB dipercepat berbentuk...", opts: ["Garis lurus miring ke atas", "Garis horizontal mendatar", "Garis miring ke bawah", "Garis melengkung parabola"], ans: 0 },
+            { id: 11, q: "Ketika Anda menyeberang jalan dan melihat mobil mengerem mendadak, mobil tersebut mengalami...", opts: ["GLB", "GLBB dengan percepatan positif", "GLBB dengan percepatan negatif", "Gerak tidak beraturan"], ans: 2 },
+            { id: 12, q: "Jika jarak tempuh s sebanding dengan kuadrat waktu t² ($s \\propto t^2$), maka benda mengalami...", opts: ["GLB", "GLBB", "Gerak Diam", "Gerak Melingkar"], ans: 1 },
+            { id: 13, q: "Pelari A bergerak GLB dengan v = 6 m/s. Pelari B bergerak GLB dengan v = 8 m/s dari titik awal yang sama. Selisih jarak keduanya setelah 5 detik adalah...", opts: ["2 m", "10 m", "30 m", "40 m"], ans: 1 },
+            { id: 14, q: "Manakah pernyataan yang BENAR mengenai GLBB?", opts: ["Kecepatan selalu konstan", "Percepatan bernilai konstan dan tidak nol", "Lintasan berbentuk parabola", "Jarak selalu berkurang"], ans: 1 },
+            { id: 15, q: "Dua benda A dan B memiliki grafik v-t sejajar mendatar. Ini berarti...", opts: ["Keduanya memiliki percepatan yang sama (a=0)", "Kecepatan keduanya pasti sama", "Jarak keduanya selalu sama", "Keduanya berhenti bersamaan"], ans: 0 }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = QUIZ_DATA.map((item, idx) => `
+                <div style="margin-bottom: 15px; background: #0f172a; padding: 12px; border-radius: 8px;">
+                    <p style="font-size: 0.85rem; font-weight: 600;">${idx + 1}. ${item.q}</p>
+                    <div style="margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">
+                        ${item.opts.map((opt, oIdx) => `
+                            <label style="font-size: 0.8rem; cursor: pointer;">
+                                <input type="radio" name="quiz-${item.id}" value="${oIdx}"> ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function submitQuiz() {
+            let correct = 0;
+            QUIZ_DATA.forEach(item => {
+                const checked = document.querySelector(`input[name="quiz-${item.id}"]:checked`);
+                if (checked && parseInt(checked.value) === item.ans) correct++;
+            });
+            APP_STATE.quizScore = (correct / QUIZ_DATA.length) * 100;
+            playSound('correct');
+
+            const resDiv = document.getElementById('quiz-result');
+            resDiv.style.display = 'block';
+            resDiv.innerHTML = `<strong>Hasil Kuis Evaluasi:</strong> Skor kamu ${APP_STATE.quizScore.toFixed(1)}/100 (${correct} Benar dari 15 Soal).`;
+            saveToStorage();
+        }
+
+        /* --- REFLEKSI & REKAP NILAI --- */
+        function saveRefleksi(showAlert = false) {
+            const reflData = {
+                r1: document.getElementById('refl-1').value,
+                r2: document.getElementById('refl-2').value,
+                r3: document.getElementById('refl-3').value
+            };
+            localStorage.setItem('LAB_GERAK_REFLEKSI', JSON.stringify(reflData));
+            if (showAlert) {
+                playSound('correct');
+                alert('Refleksi berhasil disimpan!');
+            }
+        }
+
+        function renderRekapHasil() {
+            const expScore = (APP_STATE.dataGLB.length >= 3 && APP_STATE.dataGLBB.length >= 3) ? 100 : 60;
+            const finalScore = (APP_STATE.pretestScore * 0.1) + (expScore * 0.3) + (85 * 0.25) + (APP_STATE.quizScore * 0.25) + (100 * 0.1);
+
+            let predikat = "Cukup";
+            if (finalScore >= 90) predikat = "Sangat Baik (Sangat Kompeten)";
+            else if (finalScore >= 80) predikat = "Baik (Kompeten)";
+            else if (finalScore < 70) predikat = "Perlu Bimbingan";
+
+            const container = document.getElementById('rekap-nilai-card');
+            container.innerHTML = `
+                <div>
+                    <h3 style="color: var(--primary); font-size: 2.5rem; text-align: center; margin-bottom: 10px;">${finalScore.toFixed(0)}</h3>
+                    <p style="text-align: center; font-weight: bold; color: var(--accent);">${predikat}</p>
+                </div>
+                <div>
+                    <ul style="font-size: 0.85rem; list-style: none;">
+                        <li>📝 Pre-Test: ${APP_STATE.pretestScore.toFixed(0)} / 100 (Bobot 10%)</li>
+                        <li>🧪 Eksperimen & Data: ${expScore} / 100 (Bobot 30%)</li>
+                        <li>📄 LKPD Analisis: 85 / 100 (Bobot 25%)</li>
+                        <li>✍️ Kuis Evaluasi: ${APP_STATE.quizScore.toFixed(0)} / 100 (Bobot 25%)</li>
+                        <li>💭 Refleksi: 100 / 100 (Bobot 10%)</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        /* --- LOCAL STORAGE & EXPORT --- */
+        function saveToStorage() {
+            localStorage.setItem('LAB_GERAK_STATE', JSON.stringify(APP_STATE));
+        }
+
+        function loadDataFromStorage() {
+            const savedState = localStorage.getItem('LAB_GERAK_STATE');
+            if (savedState) {
+                const parsed = JSON.parse(savedState);
+                APP_STATE.pretestScore = parsed.pretestScore || 0;
+                APP_STATE.quizScore = parsed.quizScore || 0;
+                APP_STATE.dataGLB = parsed.dataGLB || [];
+                APP_STATE.dataGLBB = parsed.dataGLBB || [];
+                renderTable('GLB');
+                renderTable('GLBB');
+            }
+
+            const savedLKPD = localStorage.getItem('LAB_GERAK_LKPD');
+            if (savedLKPD) {
+                const parsed = JSON.parse(savedLKPD);
+                document.getElementById('lkpd-nama').value = parsed.nama || '';
+                document.getElementById('lkpd-kelas').value = parsed.kelas || '8';
+                document.getElementById('lkpd-tanggal').value = parsed.tanggal || '';
+                document.getElementById('lkpd-prediksi-1').value = parsed.p1 || '';
+                document.getElementById('lkpd-prediksi-2').value = parsed.p2 || '';
+                document.getElementById('lkpd-analisis-1').value = parsed.a1 || '';
+                document.getElementById('lkpd-analisis-2').value = parsed.a2 || '';
+                document.getElementById('lkpd-kesimpulan').value = parsed.kesimpulan || '';
+            }
+
+            const savedRefl = localStorage.getItem('LAB_GERAK_REFLEKSI');
+            if (savedRefl) {
+                const parsed = JSON.parse(savedRefl);
+                document.getElementById('refl-1').value = parsed.r1 || '';
+                document.getElementById('refl-2').value = parsed.r2 || '';
+                document.getElementById('refl-3').value = parsed.r3 || '';
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Apakah Anda yakin ingin menghapus seluruh data eksperimen dan LKPD?')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "LKPD_GerakLurus_Data.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        /* --- APPLICATION INITIALIZATION --- */
+        window.addEventListener('DOMContentLoaded', () => {
+            renderPreTest();
+            renderChallenges();
+            renderQuiz();
+            loadDataFromStorage();
+
+            // Init Canvas Default Sizes
+            initCanvasGLB();
+            initCanvasGLBB();
+            initCanvasDuaBenda();
+
+            // Auto Set Date
+            document.getElementById('lkpd-tanggal').value = new Date().toISOString().split('T')[0];
+        });
+
+        // Resize Canvas on Window Resize
+        window.addEventListener('resize', () => {
+            initCanvasGLB();
+            initCanvasGLBB();
+            initCanvasDuaBenda();
+        });
+    </script>
+</body>
+</html>
